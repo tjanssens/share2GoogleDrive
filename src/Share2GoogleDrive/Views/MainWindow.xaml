@@ -1,0 +1,204 @@
+<Window x:Class="Share2GoogleDrive.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Share2GoogleDrive - Settings"
+        Width="500" Height="550"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Closing="Window_Closing">
+
+    <Window.Resources>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="10,5"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10">
+
+                <!-- Account Section -->
+                <GroupBox Header="Google Account">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Status:" FontWeight="Bold"/>
+                                <TextBlock x:Name="AccountStatus"
+                                           Text="{Binding IsConnected, Converter={StaticResource BoolToStatusConverter}}"
+                                           Foreground="{Binding IsConnected, Converter={StaticResource BoolToColorConverter}}"/>
+                                <TextBlock Text="{Binding AccountEmail}"
+                                           Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}"
+                                           Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Content="Sign In"
+                                        Command="{Binding SignInCommand}"
+                                        Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                <Button Content="Sign Out"
+                                        Command="{Binding SignOutCommand}"
+                                        Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Upload Settings Section -->
+                <GroupBox Header="Upload Settings">
+                    <StackPanel>
+                        <Grid Margin="0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="Target Folder:" Margin="0,0,10,0"/>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding TargetFolderName, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     Padding="5"/>
+                            <Button Grid.Column="2"
+                                    Content="Browse..."
+                                    Click="BrowseFolder_Click"
+                                    IsEnabled="{Binding IsConnected}"/>
+                        </Grid>
+
+                        <CheckBox Content="Open file in browser after upload"
+                                  IsChecked="{Binding OpenInBrowserAfterUpload}"/>
+                        <CheckBox Content="Show notifications"
+                                  IsChecked="{Binding ShowNotifications}"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Keyboard Shortcut Section -->
+                <GroupBox Header="Keyboard Shortcut">
+                    <StackPanel>
+                        <CheckBox Content="Enable global hotkey"
+                                  IsChecked="{Binding HotkeyEnabled}"/>
+
+                        <Grid Margin="0,10,0,0" IsEnabled="{Binding HotkeyEnabled}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="Shortcut:" Margin="0,0,10,0"/>
+                            <TextBox Grid.Column="1"
+                                     x:Name="HotkeyTextBox"
+                                     IsReadOnly="True"
+                                     Padding="5"
+                                     PreviewKeyDown="HotkeyTextBox_PreviewKeyDown"
+                                     GotFocus="HotkeyTextBox_GotFocus"
+                                     LostFocus="HotkeyTextBox_LostFocus"/>
+                            <Button Grid.Column="2"
+                                    Content="Reset"
+                                    Command="{Binding ResetHotkeyCommand}"/>
+                        </Grid>
+
+                        <TextBlock Text="Click the text box and press your desired key combination"
+                                   FontStyle="Italic"
+                                   Foreground="Gray"
+                                   Margin="5,5,0,0"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Context Menu Section -->
+                <GroupBox Header="Context Menu">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Right-click menu entry 'Send 2 Drive'"/>
+                                <TextBlock x:Name="ContextMenuStatus"
+                                           Text="{Binding ContextMenuRegistered, Converter={StaticResource BoolToRegisteredConverter}}"
+                                           Foreground="{Binding ContextMenuRegistered, Converter={StaticResource BoolToColorConverter}}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Content="Register"
+                                        Command="{Binding RegisterContextMenuCommand}"
+                                        Visibility="{Binding ContextMenuRegistered, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                <Button Content="Remove"
+                                        Command="{Binding UnregisterContextMenuCommand}"
+                                        Visibility="{Binding ContextMenuRegistered, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- General Settings Section -->
+                <GroupBox Header="General">
+                    <StackPanel>
+                        <CheckBox Content="Start with Windows"
+                                  IsChecked="{Binding Autostart}"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Status Bar and Buttons -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="{Binding StatusMessage}"
+                       VerticalAlignment="Center"
+                       Foreground="Gray"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Save"
+                        Command="{Binding SaveSettingsCommand}"
+                        IsDefault="True"/>
+                <Button Content="Close"
+                        Click="Close_Click"
+                        IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Loading Overlay -->
+        <Grid Grid.RowSpan="2"
+              Background="#80000000"
+              Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20"/>
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
