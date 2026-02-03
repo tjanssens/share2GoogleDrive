@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly IGoogleAuthService _authService;
     private readonly IHotkeyService _hotkeyService;
+    private readonly IGoogleDriveService _driveService;
 
     [ObservableProperty]
     private bool _isConnected;
@@ -56,11 +57,13 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(
         ISettingsService settingsService,
         IGoogleAuthService authService,
-        IHotkeyService hotkeyService)
+        IHotkeyService hotkeyService,
+        IGoogleDriveService driveService)
     {
         _settingsService = settingsService;
         _authService = authService;
         _hotkeyService = hotkeyService;
+        _driveService = driveService;
     }
 
     public async Task InitializeAsync()
@@ -175,6 +178,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await _authService.SignOutAsync();
+            _driveService.ClearCache();
             AccountEmail = null;
             IsConnected = false;
 

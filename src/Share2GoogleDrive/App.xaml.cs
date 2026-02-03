@@ -124,7 +124,7 @@ public partial class App : Application
     {
         if (_mainWindow == null)
         {
-            var viewModel = new MainViewModel(_settingsService, _authService, _hotkeyService);
+            var viewModel = new MainViewModel(_settingsService, _authService, _hotkeyService, _driveService);
             _mainWindow = new MainWindow(viewModel);
         }
 

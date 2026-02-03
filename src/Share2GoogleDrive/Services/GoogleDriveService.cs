@@ -20,6 +20,7 @@ public interface IGoogleDriveService
     Task<List<DriveFolder>> GetFoldersAsync(string? parentId = null);
     Task<DriveFolder> CreateFolderAsync(string name, string? parentId = null);
     void OpenInBrowser(string webViewLink);
+    void ClearCache();
 }
 
 public class GoogleDriveService : IGoogleDriveService
@@ -82,7 +83,7 @@ public class GoogleDriveService : IGoogleDriveService
                 var fileMetadata = new DriveFile
                 {
                     Name = fileName,
-                    Parents = folderId != null ? new List<string> { folderId } : null
+                    Parents = !string.IsNullOrEmpty(folderId) ? new List<string> { folderId } : null
                 };
 
                 await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -280,7 +281,7 @@ public class GoogleDriveService : IGoogleDriveService
             {
                 Name = name,
                 MimeType = "application/vnd.google-apps.folder",
-                Parents = parentId != null ? new List<string> { parentId } : null
+                Parents = !string.IsNullOrEmpty(parentId) ? new List<string> { parentId } : null
             };
 
             var request = service.Files.Create(folderMetadata);
@@ -320,6 +321,13 @@ public class GoogleDriveService : IGoogleDriveService
         {
             Log.Error(ex, "Failed to open file in browser");
         }
+    }
+
+    public void ClearCache()
+    {
+        _driveService?.Dispose();
+        _driveService = null;
+        Log.Information("Drive service cache cleared");
     }
 
     private static string GetMimeType(string filePath)
