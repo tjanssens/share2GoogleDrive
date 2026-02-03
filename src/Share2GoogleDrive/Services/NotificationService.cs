@@ -53,8 +53,8 @@ public class NotificationService : INotificationService
         try
         {
             new ToastContentBuilder()
-                .AddText("Upload Started")
-                .AddText($"Uploading {fileName} to Google Drive...")
+                .AddText("Let's-a go! 🍄")
+                .AddText($"Mario is delivering {fileName} to the cloud!")
                 .SetToastScenario(ToastScenario.Default)
                 .Show();
 
@@ -71,13 +71,13 @@ public class NotificationService : INotificationService
         try
         {
             var builder = new ToastContentBuilder()
-                .AddText("Upload Complete")
-                .AddText($"{fileName} has been uploaded to Google Drive.");
+                .AddText("Wahoo! ⭐")
+                .AddText($"{fileName} has reached the castle!");
 
             if (!string.IsNullOrEmpty(webViewLink))
             {
                 builder.AddButton(new ToastButton()
-                    .SetContent("Open in Browser")
+                    .SetContent("Enter the Pipe 🟢")
                     .AddArgument("action", "open")
                     .AddArgument("url", webViewLink));
             }
@@ -97,8 +97,8 @@ public class NotificationService : INotificationService
         try
         {
             new ToastContentBuilder()
-                .AddText("Upload Failed")
-                .AddText($"Failed to upload {fileName}")
+                .AddText("Mamma Mia! 💀")
+                .AddText($"Mario dropped {fileName}!")
                 .AddText(errorMessage)
                 .Show();
 
@@ -115,7 +115,7 @@ public class NotificationService : INotificationService
         try
         {
             new ToastContentBuilder()
-                .AddText(title)
+                .AddText($"🍄 {title}")
                 .AddText(message)
                 .Show();
         }
@@ -130,7 +130,7 @@ public class NotificationService : INotificationService
         try
         {
             new ToastContentBuilder()
-                .AddText(title)
+                .AddText($"Game Over! 💀 {title}")
                 .AddText(message)
                 .SetToastScenario(ToastScenario.Default)
                 .Show();

@@ -35,7 +35,7 @@ public class BoolToStatusConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return value is true ? "Connected" : "Not connected";
+        return value is true ? "🌟 Player 1 Ready!" : "👻 No Player";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -48,7 +48,7 @@ public class BoolToRegisteredConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return value is true ? "Registered" : "Not registered";
+        return value is true ? "🟢 Pipe Installed!" : "❌ No Pipe";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

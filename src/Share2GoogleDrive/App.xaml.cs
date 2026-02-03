@@ -112,9 +112,9 @@ public partial class App : Application
         _authService = new GoogleAuthService(_settingsService);
         _driveService = new GoogleDriveService(_authService, _settingsService);
         _notificationService = new NotificationService();
-        _uploadService = new UploadService(_driveService, _settingsService, _notificationService);
         _hotkeyService = new HotkeyService();
         _trayIconService = new TrayIconService();
+        _uploadService = new UploadService(_driveService, _settingsService, _notificationService, _trayIconService);
 
         // Subscribe to conflict events
         _uploadService.ConflictDetected += OnConflictDetected;
@@ -150,8 +150,8 @@ public partial class App : Application
         var selectedFile = ExplorerHelper.GetSelectedFile();
         if (string.IsNullOrEmpty(selectedFile))
         {
-            _notificationService.ShowInfo("No File Selected",
-                "Please select a file in Windows Explorer first.");
+            _notificationService.ShowInfo("Hey! Listen!",
+                "Select a file first, then press the hotkey!");
             return;
         }
 

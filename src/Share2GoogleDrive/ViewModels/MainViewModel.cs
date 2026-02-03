@@ -66,7 +66,7 @@ public partial class MainViewModel : ObservableObject
     public async Task InitializeAsync()
     {
         IsLoading = true;
-        StatusMessage = "Loading settings...";
+        StatusMessage = "🍄 Loading world...";
 
         try
         {
@@ -91,7 +91,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to initialize MainViewModel");
-            StatusMessage = "Failed to load settings";
+            StatusMessage = "💀 Game Over! Failed to load";
         }
         finally
         {
@@ -141,7 +141,7 @@ public partial class MainViewModel : ObservableObject
     private async Task SignInAsync()
     {
         IsLoading = true;
-        StatusMessage = "Signing in...";
+        StatusMessage = "🚀 Entering the game...";
 
         try
         {
@@ -152,12 +152,12 @@ public partial class MainViewModel : ObservableObject
             SaveViewModelToSettings();
             await _settingsService.SaveAsync();
 
-            StatusMessage = "Signed in successfully";
+            StatusMessage = "🌟 It's-a me! Welcome!";
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Sign in failed");
-            StatusMessage = $"Sign in failed: {ex.Message}";
+            StatusMessage = $"💀 Mamma Mia! {ex.Message}";
             IsConnected = false;
         }
         finally
@@ -170,7 +170,7 @@ public partial class MainViewModel : ObservableObject
     private async Task SignOutAsync()
     {
         IsLoading = true;
-        StatusMessage = "Signing out...";
+        StatusMessage = "🚪 Exiting game...";
 
         try
         {
@@ -181,12 +181,12 @@ public partial class MainViewModel : ObservableObject
             SaveViewModelToSettings();
             await _settingsService.SaveAsync();
 
-            StatusMessage = "Signed out successfully";
+            StatusMessage = "👋 See you next time!";
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Sign out failed");
-            StatusMessage = $"Sign out failed: {ex.Message}";
+            StatusMessage = $"💀 Oops! {ex.Message}";
         }
         finally
         {
@@ -198,7 +198,7 @@ public partial class MainViewModel : ObservableObject
     private async Task SaveSettingsAsync()
     {
         IsLoading = true;
-        StatusMessage = "Saving settings...";
+        StatusMessage = "💾 Saving progress...";
 
         try
         {
@@ -226,12 +226,12 @@ public partial class MainViewModel : ObservableObject
                 RegistryHelper.DisableAutostart();
             }
 
-            StatusMessage = "Settings saved";
+            StatusMessage = "⭐ Progress saved! Wahoo!";
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to save settings");
-            StatusMessage = $"Failed to save: {ex.Message}";
+            StatusMessage = $"💀 Save failed! {ex.Message}";
         }
         finally
         {
@@ -243,14 +243,22 @@ public partial class MainViewModel : ObservableObject
     private void RegisterContextMenu()
     {
         var exePath = Environment.ProcessPath ?? string.Empty;
-        if (RegistryHelper.RegisterContextMenu(exePath))
+        var iconPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(exePath) ?? "", "Resources", "Icons", "app.ico");
+
+        // If embedded icon doesn't exist as file, use exe path (which contains the icon)
+        if (!System.IO.File.Exists(iconPath))
+        {
+            iconPath = exePath;
+        }
+
+        if (RegistryHelper.RegisterContextMenu(exePath, iconPath))
         {
             ContextMenuRegistered = true;
-            StatusMessage = "Context menu registered";
+            StatusMessage = "🟢 Pipe installed! Wahoo!";
         }
         else
         {
-            StatusMessage = "Failed to register context menu";
+            StatusMessage = "Mamma Mia! Failed to install pipe";
         }
     }
 
@@ -260,11 +268,11 @@ public partial class MainViewModel : ObservableObject
         if (RegistryHelper.UnregisterContextMenu())
         {
             ContextMenuRegistered = false;
-            StatusMessage = "Context menu removed";
+            StatusMessage = "🔴 Pipe removed!";
         }
         else
         {
-            StatusMessage = "Failed to remove context menu";
+            StatusMessage = "💀 Failed to remove pipe!";
         }
     }
 

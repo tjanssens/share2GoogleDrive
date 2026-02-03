@@ -11,6 +11,17 @@ public partial class ConflictDialog : Window
     {
         InitializeComponent();
         FileNameText.Text = fileName;
+
+        // Bring window to front when shown
+        Loaded += (s, e) =>
+        {
+            Topmost = true;
+            Activate();
+            Focus();
+            // Reset topmost after a moment so other windows can go on top if needed
+            Dispatcher.BeginInvoke(new Action(() => Topmost = false),
+                System.Windows.Threading.DispatcherPriority.Background);
+        };
     }
 
     private void Replace_Click(object sender, RoutedEventArgs e)

@@ -1,49 +1,67 @@
 <Window x:Class="Share2GoogleDrive.Views.ConflictDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="File Already Exists"
-        Width="400" Height="200"
+        Title="⚠️ Item Already in Castle!"
+        Width="450" Height="250"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
+        Background="{StaticResource SkyBlueBrush}"
         WindowStyle="ToolWindow">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border Margin="15"
+            Background="#FFFEF8E8"
+            BorderBrush="{StaticResource BlockBrownBrush}"
+            BorderThickness="4"
+            CornerRadius="8"
+            Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="A file with this name already exists in the destination folder:"
-                       TextWrapping="Wrap"
-                       Margin="0,0,0,10"/>
-            <TextBlock x:Name="FileNameText"
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="🏰 Mamma Mia! This item is already in the castle:"
+                           TextWrapping="Wrap"
+                           FontSize="14"
+                           Foreground="#333"
+                           Margin="0,0,0,10"/>
+                <Border Background="{StaticResource MarioYellowBrush}"
+                        BorderBrush="{StaticResource BlockBrownBrush}"
+                        BorderThickness="2"
+                        CornerRadius="4"
+                        Padding="10,5">
+                    <TextBlock x:Name="FileNameText"
+                               FontWeight="Bold"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               Foreground="#333"/>
+                </Border>
+            </StackPanel>
+
+            <TextBlock Grid.Row="1"
+                       Text="⭐ What would you like to do?"
+                       VerticalAlignment="Center"
+                       FontSize="14"
                        FontWeight="Bold"
-                       TextWrapping="Wrap"/>
-        </StackPanel>
+                       Foreground="{StaticResource MarioRedBrush}"
+                       Margin="0,15"/>
 
-        <TextBlock Grid.Row="1"
-                   Text="What would you like to do?"
-                   VerticalAlignment="Center"
-                   Margin="0,15"/>
-
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Replace"
-                    Padding="15,8"
-                    Margin="5"
-                    Click="Replace_Click"
-                    ToolTip="Overwrite the existing file"/>
-            <Button Content="Keep Both"
-                    Padding="15,8"
-                    Margin="5"
-                    Click="KeepBoth_Click"
-                    ToolTip="Upload with a new name"/>
-            <Button Content="Cancel"
-                    Padding="15,8"
-                    Margin="5"
-                    Click="Cancel_Click"
-                    IsCancel="True"/>
-        </StackPanel>
-    </Grid>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="🔄 Replace"
+                        Style="{StaticResource DangerButton}"
+                        Click="Replace_Click"
+                        ToolTip="Stomp the old one!"/>
+                <Button Content="📦 Keep Both"
+                        Style="{StaticResource MarioButton}"
+                        Click="KeepBoth_Click"
+                        ToolTip="Collect both coins!"/>
+                <Button Content="🚫 Cancel"
+                        Style="{StaticResource PipeButton}"
+                        Click="Cancel_Click"
+                        IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>

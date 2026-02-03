@@ -17,6 +17,29 @@ public partial class MainWindow : Window
 
         Loaded += MainWindow_Loaded;
         UpdateHotkeyDisplay();
+
+        // Check if screen is smaller than window, if so make resizable
+        AdjustForScreenSize();
+    }
+
+    private void AdjustForScreenSize()
+    {
+        var screenWidth = SystemParameters.WorkArea.Width;
+        var screenHeight = SystemParameters.WorkArea.Height;
+
+        if (screenWidth < Width || screenHeight < Height)
+        {
+            // Screen is smaller than window - allow resizing
+            ResizeMode = ResizeMode.CanResizeWithGrip;
+            MinWidth = 480;
+            MinHeight = 600;
+
+            // Fit to screen with some margin
+            if (Width > screenWidth)
+                Width = screenWidth - 40;
+            if (Height > screenHeight)
+                Height = screenHeight - 40;
+        }
     }
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)

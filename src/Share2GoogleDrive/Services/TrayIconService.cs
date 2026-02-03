@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Windows;
+using System.Windows.Threading;
 using Hardcodet.Wpf.TaskbarNotification;
 using Serilog;
 
@@ -12,6 +13,8 @@ public interface ITrayIconService : IDisposable
 {
     void Initialize();
     void ShowBalloon(string title, string message, BalloonIcon icon = BalloonIcon.Info);
+    void StartUploadAnimation();
+    void StopUploadAnimation();
     event EventHandler? SettingsRequested;
     event EventHandler? ExitRequested;
 }
@@ -19,6 +22,11 @@ public interface ITrayIconService : IDisposable
 public class TrayIconService : ITrayIconService
 {
     private TaskbarIcon? _trayIcon;
+    private Icon? _staticIcon;
+    private Icon[]? _animationFrames;
+    private DispatcherTimer? _animationTimer;
+    private int _currentFrame;
+    private bool _isAnimating;
 
     public event EventHandler? SettingsRequested;
     public event EventHandler? ExitRequested;
@@ -29,14 +37,24 @@ public class TrayIconService : ITrayIconService
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
+                _staticIcon = LoadIcon("app.ico");
+                _animationFrames = LoadAnimationFrames();
+
                 _trayIcon = new TaskbarIcon
                 {
-                    ToolTipText = "Share2GoogleDrive",
-                    Icon = LoadIcon(),
+                    ToolTipText = "It's-a me, Mario! Ready to deliver your files! 🍄",
+                    Icon = _staticIcon,
                     ContextMenu = CreateContextMenu()
                 };
 
                 _trayIcon.TrayMouseDoubleClick += OnTrayDoubleClick;
+
+                // Setup animation timer
+                _animationTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(150)
+                };
+                _animationTimer.Tick += OnAnimationTick;
             });
 
             Log.Information("Tray icon initialized");
@@ -48,13 +66,52 @@ public class TrayIconService : ITrayIconService
         }
     }
 
-    private Icon LoadIcon()
+    private void OnAnimationTick(object? sender, EventArgs e)
+    {
+        if (_trayIcon == null || _animationFrames == null || _animationFrames.Length == 0)
+            return;
+
+        _currentFrame = (_currentFrame + 1) % _animationFrames.Length;
+        _trayIcon.Icon = _animationFrames[_currentFrame];
+    }
+
+    public void StartUploadAnimation()
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (_isAnimating || _animationFrames == null || _animationFrames.Length == 0)
+                return;
+
+            _isAnimating = true;
+            _currentFrame = 0;
+            _animationTimer?.Start();
+            Log.Debug("Upload animation started");
+        });
+    }
+
+    public void StopUploadAnimation()
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (!_isAnimating)
+                return;
+
+            _isAnimating = false;
+            _animationTimer?.Stop();
+            if (_trayIcon != null && _staticIcon != null)
+            {
+                _trayIcon.Icon = _staticIcon;
+            }
+            Log.Debug("Upload animation stopped");
+        });
+    }
+
+    private Icon LoadIcon(string iconName)
     {
         try
         {
-            // Try to load embedded icon
             var resourceStream = Application.GetResourceStream(
-                new Uri("pack://application:,,,/Resources/Icons/app.ico"));
+                new Uri($"pack://application:,,,/Resources/Icons/{iconName}"));
 
             if (resourceStream != null)
             {
@@ -63,24 +120,49 @@ public class TrayIconService : ITrayIconService
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Failed to load custom icon, using default");
+            Log.Warning(ex, "Failed to load icon {IconName}, using default", iconName);
         }
 
-        // Create a simple default icon
         return SystemIcons.Application;
+    }
+
+    private Icon[] LoadAnimationFrames()
+    {
+        var frames = new List<Icon>();
+
+        for (int i = 1; i <= 6; i++)
+        {
+            try
+            {
+                var resourceStream = Application.GetResourceStream(
+                    new Uri($"pack://application:,,,/Resources/Icons/walk_{i}.ico"));
+
+                if (resourceStream != null)
+                {
+                    frames.Add(new Icon(resourceStream.Stream));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to load animation frame {Frame}", i);
+            }
+        }
+
+        Log.Information("Loaded {Count} animation frames", frames.Count);
+        return frames.ToArray();
     }
 
     private System.Windows.Controls.ContextMenu CreateContextMenu()
     {
         var menu = new System.Windows.Controls.ContextMenu();
 
-        var settingsItem = new System.Windows.Controls.MenuItem { Header = "Settings" };
+        var settingsItem = new System.Windows.Controls.MenuItem { Header = "⚙️ Warp Zone (Settings)" };
         settingsItem.Click += (_, _) => SettingsRequested?.Invoke(this, EventArgs.Empty);
         menu.Items.Add(settingsItem);
 
         menu.Items.Add(new System.Windows.Controls.Separator());
 
-        var exitItem = new System.Windows.Controls.MenuItem { Header = "Exit" };
+        var exitItem = new System.Windows.Controls.MenuItem { Header = "🚪 Exit the Castle" };
         exitItem.Click += (_, _) => ExitRequested?.Invoke(this, EventArgs.Empty);
         menu.Items.Add(exitItem);
 

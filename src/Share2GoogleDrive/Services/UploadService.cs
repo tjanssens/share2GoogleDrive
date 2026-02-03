@@ -35,6 +35,7 @@ public class UploadService : IUploadService
     private readonly IGoogleDriveService _driveService;
     private readonly ISettingsService _settingsService;
     private readonly INotificationService _notificationService;
+    private readonly ITrayIconService _trayIconService;
 
     public event EventHandler<UploadProgressEventArgs>? ProgressChanged;
     public event EventHandler<ConflictEventArgs>? ConflictDetected;
@@ -42,11 +43,13 @@ public class UploadService : IUploadService
     public UploadService(
         IGoogleDriveService driveService,
         ISettingsService settingsService,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ITrayIconService trayIconService)
     {
         _driveService = driveService;
         _settingsService = settingsService;
         _notificationService = notificationService;
+        _trayIconService = trayIconService;
     }
 
     public async Task<UploadResult> UploadFileAsync(string filePath, CancellationToken cancellationToken = default)
@@ -69,6 +72,9 @@ public class UploadService : IUploadService
         {
             _notificationService.ShowUploadStarted(fileName);
         }
+
+        // Start upload animation
+        _trayIconService.StartUploadAnimation();
 
         try
         {
@@ -141,6 +147,11 @@ public class UploadService : IUploadService
             var errorResult = UploadResult.Failed(ex.Message);
             _notificationService.ShowUploadFailed(fileName, ex.Message);
             return errorResult;
+        }
+        finally
+        {
+            // Stop upload animation
+            _trayIconService.StopUploadAnimation();
         }
     }
 

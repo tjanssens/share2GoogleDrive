@@ -1,80 +1,111 @@
 <Window x:Class="Share2GoogleDrive.Views.FolderBrowserDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Select Google Drive Folder"
-        Width="400" Height="450"
+        Title="🏰 Select Your Castle"
+        Width="450" Height="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
-        MinWidth="300" MinHeight="300">
+        MinWidth="350" MinHeight="350"
+        Background="{StaticResource SkyBlueBrush}">
 
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border Margin="10"
+            Background="#FFFEF8E8"
+            BorderBrush="{StaticResource BlockBrownBrush}"
+            BorderThickness="4"
+            CornerRadius="8"
+            Padding="15">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="Select a folder to upload files to:"
-                   Margin="0,0,0,10"/>
+            <TextBlock Grid.Row="0"
+                       Text="🗺️ Choose a castle to deliver files to:"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource MarioRedBrush}"
+                       Margin="0,0,0,10"/>
 
-        <TreeView Grid.Row="1"
-                  x:Name="FolderTree"
-                  SelectedItemChanged="FolderTree_SelectedItemChanged">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="📁 " FontSize="14"/>
-                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+            <Border Grid.Row="1"
+                    BorderBrush="{StaticResource BlockBrownBrush}"
+                    BorderThickness="2"
+                    CornerRadius="4"
+                    Background="White">
+                <TreeView x:Name="FolderTree"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          SelectedItemChanged="FolderTree_SelectedItemChanged">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🏰 " FontSize="14"/>
+                                <TextBlock Text="{Binding Name}"
+                                           VerticalAlignment="Center"
+                                           FontSize="13"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </Border>
 
-        <!-- Create New Folder -->
-        <Grid Grid.Row="2" Margin="0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <!-- Create New Folder -->
+            <Grid Grid.Row="2" Margin="0,15,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0"
-                     x:Name="NewFolderNameTextBox"
-                     Padding="5"
-                     VerticalContentAlignment="Center"/>
-            <Button Grid.Column="1"
-                    Content="Create Folder"
-                    Padding="10,5"
-                    Margin="5,0,0,0"
-                    Click="CreateFolder_Click"/>
-        </Grid>
+                <TextBox Grid.Column="0"
+                         x:Name="NewFolderNameTextBox"
+                         Style="{StaticResource MarioTextBox}"
+                         VerticalContentAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="🏗️ Build Castle"
+                        Style="{StaticResource MarioButton}"
+                        Margin="10,0,0,0"
+                        Click="CreateFolder_Click"/>
+            </Grid>
 
-        <!-- Buttons -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Select"
-                    Padding="20,8"
-                    Margin="5"
-                    Click="Select_Click"
-                    IsDefault="True"/>
-            <Button Content="Cancel"
-                    Padding="20,8"
-                    Margin="5"
-                    Click="Cancel_Click"
-                    IsCancel="True"/>
-        </StackPanel>
-
-        <!-- Loading Overlay -->
-        <Grid Grid.RowSpan="4"
-              x:Name="LoadingOverlay"
-              Background="#80FFFFFF"
-              Visibility="Collapsed">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ProgressBar IsIndeterminate="True" Width="150" Height="15"/>
-                <TextBlock Text="Loading folders..."
-                           HorizontalAlignment="Center"
-                           Margin="0,10,0,0"/>
+            <!-- Buttons -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button Content="✅ Enter Castle"
+                        Style="{StaticResource PipeButton}"
+                        Click="Select_Click"
+                        IsDefault="True"/>
+                <Button Content="🚫 Go Back"
+                        Style="{StaticResource MarioButton}"
+                        Click="Cancel_Click"
+                        IsCancel="True"/>
             </StackPanel>
+
+            <!-- Loading Overlay -->
+            <Grid Grid.RowSpan="4"
+                  x:Name="LoadingOverlay"
+                  Visibility="Collapsed">
+                <Border Background="#CC000000" CornerRadius="8"/>
+                <Border Background="{StaticResource MarioYellowBrush}"
+                        BorderBrush="{StaticResource BlockBrownBrush}"
+                        BorderThickness="3"
+                        CornerRadius="8"
+                        Padding="25"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="🔍 Exploring world..."
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"/>
+                        <ProgressBar IsIndeterminate="True"
+                                     Width="150"
+                                     Height="15"
+                                     Margin="0,10,0,0"
+                                     Foreground="{StaticResource MarioGreenBrush}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

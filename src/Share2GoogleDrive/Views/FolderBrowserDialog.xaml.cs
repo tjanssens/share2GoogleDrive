@@ -43,7 +43,7 @@ public partial class FolderBrowserDialog : Window
                 new FolderTreeItem
                 {
                     Id = null,
-                    Name = "My Drive",
+                    Name = "🌍 Mario's World",
                     HasChildren = true,
                     IsExpanded = true,
                     Children = new ObservableCollection<FolderTreeItem>(
@@ -67,7 +67,7 @@ public partial class FolderBrowserDialog : Window
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to load folders");
-            MessageBox.Show($"Failed to load folders: {ex.Message}", "Error",
+            MessageBox.Show($"Mamma Mia! {ex.Message}", "💀 Game Over",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
@@ -81,7 +81,7 @@ public partial class FolderBrowserDialog : Window
         if (item.HasChildren && item.Children.Count == 0)
         {
             // Add placeholder
-            item.Children.Add(new FolderTreeItem { Name = "Loading...", IsPlaceholder = true });
+            item.Children.Add(new FolderTreeItem { Name = "🔍 Exploring...", IsPlaceholder = true });
         }
 
         item.PropertyChanged += async (s, e) =>
@@ -124,7 +124,7 @@ public partial class FolderBrowserDialog : Window
         {
             Log.Error(ex, "Failed to load child folders for {ParentId}", parent.Id);
             parent.Children.Clear();
-            parent.Children.Add(new FolderTreeItem { Name = "Error loading folders", IsPlaceholder = true });
+            parent.Children.Add(new FolderTreeItem { Name = "💀 Oops! Try again", IsPlaceholder = true });
         }
     }
 
@@ -138,7 +138,7 @@ public partial class FolderBrowserDialog : Window
         var folderName = NewFolderNameTextBox.Text.Trim();
         if (string.IsNullOrEmpty(folderName))
         {
-            MessageBox.Show("Please enter a folder name.", "Create Folder",
+            MessageBox.Show("Hey! You need to name your castle first!", "🏗️ Build Castle",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
@@ -163,13 +163,13 @@ public partial class FolderBrowserDialog : Window
             }
 
             NewFolderNameTextBox.Clear();
-            MessageBox.Show($"Folder '{folderName}' created successfully.", "Success",
+            MessageBox.Show($"Yahoo! Castle '{folderName}' has been built!", "🎉 New Castle!",
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to create folder");
-            MessageBox.Show($"Failed to create folder: {ex.Message}", "Error",
+            MessageBox.Show($"Mamma Mia! Castle construction failed: {ex.Message}", "💀 Build Failed",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
@@ -182,7 +182,7 @@ public partial class FolderBrowserDialog : Window
     {
         if (_selectedItem == null || _selectedItem.IsPlaceholder)
         {
-            MessageBox.Show("Please select a folder.", "Select Folder",
+            MessageBox.Show("Hey! Pick a castle to enter first!", "🏰 Select Castle",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

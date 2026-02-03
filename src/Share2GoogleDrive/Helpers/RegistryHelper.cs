@@ -26,7 +26,7 @@ public static class RegistryHelper
                 return false;
             }
 
-            key.SetValue("", "Send 2 Drive");
+            key.SetValue("", "Mario Delivery!");
             key.SetValue("Icon", iconPath ?? executablePath);
 
             using var commandKey = key.CreateSubKey("command");
