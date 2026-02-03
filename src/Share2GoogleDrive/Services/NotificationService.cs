@@ -21,7 +21,31 @@ public class NotificationService : INotificationService
     public NotificationService()
     {
         // Handle notification activation (clicking on notification)
-        ToastNotificationManagerCompat.OnActivated += OnNotificationActivated;
+        ToastNotificationManagerCompat.OnActivated += e => HandleNotificationActivated(e.Argument);
+    }
+
+    private static void HandleNotificationActivated(string argument)
+    {
+        var args = ToastArguments.Parse(argument);
+
+        if (args.TryGetValue("action", out var action) && action == "open")
+        {
+            if (args.TryGetValue("url", out var url))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to open URL from notification: {Url}", url);
+                }
+            }
+        }
     }
 
     public void ShowUploadStarted(string fileName)
@@ -108,7 +132,7 @@ public class NotificationService : INotificationService
             new ToastContentBuilder()
                 .AddText(title)
                 .AddText(message)
-                .SetToastScenario(ToastScenario.Urgent)
+                .SetToastScenario(ToastScenario.Default)
                 .Show();
         }
         catch (Exception ex)
@@ -117,27 +141,4 @@ public class NotificationService : INotificationService
         }
     }
 
-    private void OnNotificationActivated(ToastNotificationActivatedEventArgsCompat e)
-    {
-        var args = ToastArguments.Parse(e.Argument);
-
-        if (args.TryGetValue("action", out var action) && action == "open")
-        {
-            if (args.TryGetValue("url", out var url))
-            {
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = url,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Failed to open URL from notification: {Url}", url);
-                }
-            }
-        }
-    }
 }

@@ -174,7 +174,9 @@ public class GoogleAuthService : IGoogleAuthService
                 ApplicationName = "Share2GoogleDrive"
             });
 
-            var about = await service.About.Get().ExecuteAsync();
+            var request = service.About.Get();
+            request.Fields = "user";
+            var about = await request.ExecuteAsync();
             return about.User?.EmailAddress;
         }
         catch (Exception ex)
