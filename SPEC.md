@@ -1,268 +1,302 @@
-# Share2GoogleDrive - Specificatie
+# Share2GoogleDrive - Specification
 
-## Overzicht
+## Overview
 
-Share2GoogleDrive is een desktop applicatie die gebruikers toelaat om bestanden snel naar Google Drive te uploaden via het Windows context menu (rechtermuisklik) of een sneltoets.
+Share2GoogleDrive is a Windows desktop application that allows users to quickly upload files to Google Drive via the Windows context menu (right-click) or a keyboard shortcut.
 
-## Functionele Vereisten
+## Functional Requirements
 
-### 1. Context Menu Integratie
+### 1. Context Menu Integration
 
-- **Functionaliteit**: Bij rechtsklikken op een bestand verschijnt een menu-item "Send 2 Drive"
-- **Gedrag**:
-  - Klikken op "Send 2 Drive" start de upload naar de geconfigureerde Google Drive map
-  - Ondersteunt enkelvoudige en meervoudige bestandsselectie
-  - Toont voortgangsindicatie tijdens upload
-  - Geeft melding bij succesvolle upload of fout
+- **Feature**: Right-clicking on a file shows a menu item "Send 2 Drive"
+- **Behavior**:
+  - Clicking "Send 2 Drive" starts the upload to the configured Google Drive folder
+  - Single file selection only (V1)
+  - Shows progress indication during upload
+  - Displays notification on successful upload or error
 
-### 2. Sneltoets Ondersteuning
+### 2. Keyboard Shortcut Support
 
-- **Standaard sneltoets**: `Ctrl + G`
-- **Gedrag**:
-  - Werkt wanneer een bestand geselecteerd is in Windows Verkenner
-  - Zelfde functionaliteit als context menu optie
-  - Sneltoets is configureerbaar via instellingen
+- **Default shortcut**: `Ctrl + G`
+- **Behavior**:
+  - Works when a file is selected in Windows Explorer
+  - Same functionality as context menu option
+  - Shortcut is configurable via settings
 
-### 3. Instellingen
+### 3. Settings
 
 #### 3.1 Google Account (OAuth)
-- OAuth 2.0 authenticatie met Google
-- Mogelijkheid om in te loggen/uit te loggen
-- Weergave van verbonden account (e-mail)
-- Ondersteuning voor meerdere accounts (optioneel)
-- Veilige opslag van tokens (encrypted)
+- OAuth 2.0 authentication with Google
+- Ability to sign in/sign out
+- Display of connected account (email)
+- Secure token storage (Windows Credential Manager)
 
-#### 3.2 Doelmap op Google Drive
-- Mapkiezer/browser voor Google Drive mappen
-- Mogelijkheid om standaard doelmap in te stellen
-- Optie om "Mijn Drive" root als standaard te gebruiken
-- Mogelijkheid om nieuwe map aan te maken
+#### 3.2 Target Folder on Google Drive
+- Folder picker/browser for Google Drive folders
+- Ability to set default target folder
+- Option to use "My Drive" root as default
+- Ability to create new folder
 
-#### 3.3 Sneltoets Configuratie
-- Aanpasbare sneltoets combinatie
-- Validatie om conflicten met systeemsneltoetsen te voorkomen
-- Reset naar standaard optie
+#### 3.3 Keyboard Shortcut Configuration
+- Customizable keyboard shortcut combination
+- Validation to prevent conflicts with system shortcuts
+- Reset to default option
 
-### 4. Gebruikersinterface
+#### 3.4 Auto-Open After Upload
+- Option to automatically open the uploaded file in Google Drive (browser)
+- Configurable: enabled/disabled
+- Default: enabled
 
-#### 4.1 Systeem Tray Icoon
-- Applicatie draait in systeem tray (system tray)
-- Rechtsklik menu met:
-  - Instellingen openen
-  - Upload geschiedenis bekijken
-  - Afsluiten
+### 4. File Conflict Handling
 
-#### 4.2 Instellingen Venster
-- Tabbladen voor verschillende instellingscategorieën:
+- When a file with the same name already exists in the target folder:
+  - Show dialog asking user what to do:
+    - **Replace**: Overwrite the existing file
+    - **Keep both**: Rename the new file (add number suffix)
+    - **Cancel**: Abort the upload
+
+### 5. User Interface
+
+#### 5.1 System Tray Icon
+- Application runs in system tray
+- Right-click menu with:
+  - Open Settings
+  - Exit
+
+#### 5.2 Settings Window
+- Tabs for different setting categories:
   - Account
-  - Upload instellingen
-  - Sneltoetsen
-  - Algemeen (autostart, notificaties, etc.)
+  - Upload Settings
+  - Keyboard Shortcut
+  - General (autostart, notifications, etc.)
 
-#### 4.3 Notificaties
-- Windows toast notificaties voor:
-  - Upload gestart
-  - Upload voltooid (met link naar bestand)
-  - Upload mislukt (met foutmelding)
+#### 5.3 Notifications
+- Windows toast notifications for:
+  - Upload started
+  - Upload completed (with clickable link to file)
+  - Upload failed (with error message)
 
-## Technische Specificaties
+## Technical Specifications
 
 ### Platform
-- **Primair**: Windows 10/11
-- **Taal**: Python 3.10+ of Electron/Node.js
-- **Packaging**: Installer (MSI/EXE) en portable versie
+- **Target**: Windows 10/11
+- **Framework**: .NET 8.0
+- **UI Framework**: WPF (Windows Presentation Foundation)
+- **Packaging**: MSIX installer and portable EXE
 
 ### Google Drive API
 - Google Drive API v3
-- OAuth 2.0 voor authenticatie
+- OAuth 2.0 for authentication
 - Scopes:
   - `https://www.googleapis.com/auth/drive.file`
   - `https://www.googleapis.com/auth/drive.metadata.readonly`
 
-### Context Menu Registratie
-- Windows Registry modificatie voor shell integratie
-- Registratie onder `HKEY_CLASSES_ROOT\*\shell\Send2Drive`
+### Context Menu Registration
+- Windows Registry modification for shell integration
+- Registration under `HKEY_CLASSES_ROOT\*\shell\Send2Drive`
+- Uses shell extension or command-line invocation
 
-### Sneltoets Implementatie
-- Globale hotkey registratie
-- Background service voor hotkey listening
+### Keyboard Shortcut Implementation
+- Global hotkey registration via Windows API (RegisterHotKey)
+- Background service for hotkey listening
 
-### Data Opslag
-- Configuratie: JSON of SQLite
-- Tokens: Windows Credential Manager of encrypted file
-- Locatie: `%APPDATA%\Share2GoogleDrive\`
+### Data Storage
+- Configuration: JSON file (System.Text.Json)
+- Tokens: Windows Credential Manager (CredentialManager NuGet)
+- Location: `%APPDATA%\Share2GoogleDrive\`
 
-## Niet-Functionele Vereisten
+## Non-Functional Requirements
 
 ### Performance
-- Upload start binnen 2 seconden na actie
-- Minimale CPU/geheugen gebruik in idle
-- Ondersteuning voor bestanden tot 5GB
+- Upload starts within 2 seconds of action
+- Minimal CPU/memory usage when idle
+- Support for files up to 5GB
 
-### Beveiliging
-- Geen opslag van wachtwoorden
-- Encrypted token opslag
-- Secure OAuth flow (geen embedded browser)
+### Security
+- No storage of passwords
+- Encrypted token storage via Windows Credential Manager
+- Secure OAuth flow (system browser, not embedded)
 
-### Betrouwbaarheid
-- Automatische retry bij netwerk fouten (max 3 pogingen)
-- Hervatbare uploads voor grote bestanden
-- Logging voor troubleshooting
+### Reliability
+- Automatic retry on network errors (max 3 attempts)
+- Resumable uploads for large files
+- Logging for troubleshooting (Serilog)
 
-### Gebruikerservaring
-- Installatie zonder admin rechten (user-level)
-- Autostart optie
-- Minimale configuratie vereist voor eerste gebruik
+### User Experience
+- User-level installation (no admin required)
+- Autostart option
+- Minimal configuration required for first use
 
-## Architectuur
+## Architecture
 
 ```
-share2GoogleDrive/
+Share2GoogleDrive/
 ├── src/
-│   ├── main.py                 # Applicatie entry point
-│   ├── config/
-│   │   ├── settings.py         # Instellingen beheer
-│   │   └── constants.py        # Constanten en defaults
-│   ├── auth/
-│   │   ├── oauth.py            # Google OAuth implementatie
-│   │   └── token_manager.py    # Token opslag en verversing
-│   ├── drive/
-│   │   ├── api.py              # Google Drive API wrapper
-│   │   ├── uploader.py         # Upload logica
-│   │   └── folder_browser.py   # Map navigatie
-│   ├── ui/
-│   │   ├── tray.py             # System tray icoon
-│   │   ├── settings_window.py  # Instellingen venster
-│   │   └── notifications.py    # Toast notificaties
-│   ├── hotkey/
-│   │   ├── listener.py         # Globale hotkey listener
-│   │   └── handler.py          # Hotkey acties
-│   └── shell/
-│       ├── context_menu.py     # Context menu registratie
-│       └── registry.py         # Windows registry operaties
-├── resources/
-│   ├── icons/                  # Applicatie iconen
-│   └── credentials.json        # Google API credentials (template)
+│   ├── Share2GoogleDrive/                    # Main WPF Application
+│   │   ├── App.xaml                          # Application entry point
+│   │   ├── App.xaml.cs
+│   │   ├── Views/
+│   │   │   ├── MainWindow.xaml               # Settings window
+│   │   │   ├── FolderBrowserDialog.xaml      # Google Drive folder picker
+│   │   │   └── ConflictDialog.xaml           # File conflict resolution
+│   │   ├── ViewModels/
+│   │   │   ├── MainViewModel.cs
+│   │   │   ├── SettingsViewModel.cs
+│   │   │   └── FolderBrowserViewModel.cs
+│   │   ├── Models/
+│   │   │   ├── AppSettings.cs
+│   │   │   └── UploadResult.cs
+│   │   ├── Services/
+│   │   │   ├── GoogleAuthService.cs          # OAuth implementation
+│   │   │   ├── GoogleDriveService.cs         # Drive API wrapper
+│   │   │   ├── SettingsService.cs            # Settings management
+│   │   │   ├── HotkeyService.cs              # Global hotkey handling
+│   │   │   ├── NotificationService.cs        # Toast notifications
+│   │   │   └── TrayIconService.cs            # System tray management
+│   │   └── Helpers/
+│   │       ├── RegistryHelper.cs             # Context menu registration
+│   │       └── CredentialHelper.cs           # Windows Credential Manager
+│   │
+│   └── Share2GoogleDrive.ShellExtension/     # Optional: Shell extension for context menu
+│       └── ...
+│
 ├── tests/
-│   └── ...                     # Unit tests
+│   └── Share2GoogleDrive.Tests/
+│       └── ...
+│
 ├── installer/
-│   └── ...                     # Installer scripts
-├── requirements.txt
-├── setup.py
+│   └── ...                                   # MSIX/WiX installer
+│
+├── resources/
+│   ├── icons/                                # Application icons
+│   └── credentials.json                      # Google API credentials (template)
+│
+├── Share2GoogleDrive.sln
 └── README.md
 ```
 
 ## User Stories
 
-### US-01: Bestand uploaden via context menu
-**Als** gebruiker
-**Wil ik** een bestand kunnen uploaden naar Google Drive via rechtsklikken
-**Zodat** ik snel bestanden kan delen zonder de browser te openen
+### US-01: Upload file via context menu
+**As a** user
+**I want to** upload a file to Google Drive via right-click
+**So that** I can quickly share files without opening the browser
 
-**Acceptatiecriteria:**
-- [ ] "Send 2 Drive" verschijnt in context menu bij rechtsklik op bestand
-- [ ] Klikken start upload naar geconfigureerde map
-- [ ] Voortgang wordt getoond
-- [ ] Notificatie bij voltooiing
+**Acceptance Criteria:**
+- [ ] "Send 2 Drive" appears in context menu when right-clicking a file
+- [ ] Clicking starts upload to configured folder
+- [ ] Progress is shown
+- [ ] Notification on completion
+- [ ] File opens in browser if setting is enabled
 
-### US-02: Bestand uploaden via sneltoets
-**Als** gebruiker
-**Wil ik** een geselecteerd bestand kunnen uploaden met een sneltoets
-**Zodat** ik nog sneller kan uploaden zonder te klikken
+### US-02: Upload file via keyboard shortcut
+**As a** user
+**I want to** upload a selected file with a keyboard shortcut
+**So that** I can upload even faster without clicking
 
-**Acceptatiecriteria:**
-- [ ] Ctrl+G (of geconfigureerde toets) start upload
-- [ ] Werkt wanneer bestand geselecteerd is in Verkenner
-- [ ] Zelfde feedback als context menu upload
+**Acceptance Criteria:**
+- [ ] Ctrl+G (or configured key) starts upload
+- [ ] Works when file is selected in Explorer
+- [ ] Same feedback as context menu upload
 
-### US-03: Google Account koppelen
-**Als** gebruiker
-**Wil ik** mijn Google account kunnen koppelen via OAuth
-**Zodat** de applicatie toegang heeft tot mijn Google Drive
+### US-03: Connect Google Account
+**As a** user
+**I want to** connect my Google account via OAuth
+**So that** the application has access to my Google Drive
 
-**Acceptatiecriteria:**
-- [ ] OAuth flow opent in standaard browser
-- [ ] Na autorisatie wordt account gekoppeld
-- [ ] Account info wordt getoond in instellingen
-- [ ] Mogelijkheid om te ontkoppelen
+**Acceptance Criteria:**
+- [ ] OAuth flow opens in default browser
+- [ ] After authorization, account is connected
+- [ ] Account info is shown in settings
+- [ ] Ability to disconnect
 
-### US-04: Doelmap instellen
-**Als** gebruiker
-**Wil ik** kunnen kiezen naar welke map bestanden worden geupload
-**Zodat** mijn bestanden georganiseerd blijven
+### US-04: Set target folder
+**As a** user
+**I want to** choose which folder files are uploaded to
+**So that** my files stay organized
 
-**Acceptatiecriteria:**
-- [ ] Mapbrowser toont Google Drive structuur
-- [ ] Geselecteerde map wordt opgeslagen
-- [ ] Nieuwe map kan worden aangemaakt
+**Acceptance Criteria:**
+- [ ] Folder browser shows Google Drive structure
+- [ ] Selected folder is saved
+- [ ] New folder can be created
 
-### US-05: Sneltoets aanpassen
-**Als** gebruiker
-**Wil ik** de sneltoets kunnen aanpassen
-**Zodat** ik een combinatie kan kiezen die voor mij werkt
+### US-05: Customize keyboard shortcut
+**As a** user
+**I want to** customize the keyboard shortcut
+**So that** I can choose a combination that works for me
 
-**Acceptatiecriteria:**
-- [ ] Sneltoets veld in instellingen
-- [ ] Drukken van toetscombinatie registreert nieuwe sneltoets
-- [ ] Waarschuwing bij conflicterende combinaties
-- [ ] Reset naar standaard beschikbaar
+**Acceptance Criteria:**
+- [ ] Shortcut field in settings
+- [ ] Pressing key combination registers new shortcut
+- [ ] Warning for conflicting combinations
+- [ ] Reset to default available
+
+### US-06: Handle file conflicts
+**As a** user
+**I want to** be asked what to do when a file already exists
+**So that** I don't accidentally overwrite important files
+
+**Acceptance Criteria:**
+- [ ] Dialog appears when file with same name exists
+- [ ] Options: Replace, Keep both, Cancel
+- [ ] Selected action is executed
+
+### US-07: Auto-open after upload
+**As a** user
+**I want to** have the option to automatically open uploaded files in browser
+**So that** I can immediately share or view the file
+
+**Acceptance Criteria:**
+- [ ] Setting to enable/disable auto-open
+- [ ] When enabled, browser opens to file after successful upload
+- [ ] Default is enabled
 
 ## Roadmap
 
-### Fase 1: MVP
-- Context menu integratie
-- Basis upload functionaliteit
-- OAuth authenticatie
-- Systeem tray applicatie
+### V1 (MVP)
+- Context menu integration
+- Single file upload
+- OAuth authentication
+- System tray application
+- Keyboard shortcut support
+- Settings window
+- Target folder selection
+- Notifications
+- File conflict handling (ask user)
+- Auto-open after upload
 
-### Fase 2: Uitbreiding
-- Sneltoets ondersteuning
-- Instellingen venster
-- Doelmap selectie
-- Notificaties
+### V2 (Future)
+- Multiple file selection upload
+- Folder upload support
+- Multiple Google accounts
+- Drag & drop to tray icon
+- Auto-update functionality
 
-### Fase 3: Polish
-- Meerdere accounts
-- Upload geschiedenis
-- Drag & drop naar tray icoon
-- Auto-update functionaliteit
+## Technology Stack
 
-## Technologie Keuzes
+### .NET 8.0 with WPF
+**Advantages:**
+- Native Windows integration
+- Excellent performance
+- Strong typing and IDE support
+- Good Google API library support
+- Modern C# features (records, pattern matching, etc.)
+- Single-file deployment option
 
-### Aanbevolen: Python
-**Voordelen:**
-- Snelle ontwikkeling
-- Goede Google API libraries (`google-api-python-client`)
-- PyQt6 of PySide6 voor UI
-- `pystray` voor system tray
-- `keyboard` of `pynput` voor globale hotkeys
-- PyInstaller voor packaging
+### NuGet Packages
 
-### Alternatief: Electron
-**Voordelen:**
-- Cross-platform (toekomstige uitbreiding)
-- Moderne UI mogelijkheden
-- Goede npm packages beschikbaar
-
-**Nadelen:**
-- Grotere applicatie grootte
-- Meer resources nodig
-
-## Dependencies (Python)
-
-```
-google-api-python-client>=2.0.0
-google-auth-oauthlib>=1.0.0
-google-auth>=2.0.0
-PyQt6>=6.4.0
-pystray>=0.19.0
-keyboard>=0.13.5
-pywin32>=305
-cryptography>=40.0.0
-requests>=2.28.0
+```xml
+<PackageReference Include="Google.Apis.Drive.v3" Version="1.68.0" />
+<PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
+<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+<PackageReference Include="Serilog" Version="3.1.1" />
+<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+<PackageReference Include="CredentialManagement" Version="1.0.2" />
 ```
 
-## Configuratie Bestand Voorbeeld
+## Configuration File Example
 
 ```json
 {
@@ -272,19 +306,49 @@ requests>=2.28.0
     "connected": true
   },
   "upload": {
-    "default_folder_id": "1ABC123xyz",
-    "default_folder_name": "Uploads",
-    "show_progress": true,
-    "notify_on_complete": true
+    "defaultFolderId": "1ABC123xyz",
+    "defaultFolderName": "Uploads",
+    "showProgress": true,
+    "notifyOnComplete": true,
+    "openInBrowserAfterUpload": true
   },
   "hotkey": {
     "enabled": true,
-    "combination": "ctrl+g"
+    "modifiers": "Control",
+    "key": "G"
   },
   "general": {
     "autostart": true,
-    "minimize_to_tray": true,
-    "language": "nl"
+    "minimizeToTray": true
   }
 }
 ```
+
+## Context Menu Registry Entry
+
+```
+[HKEY_CLASSES_ROOT\*\shell\Send2Drive]
+@="Send 2 Drive"
+"Icon"="%APPDATA%\\Share2GoogleDrive\\icon.ico"
+
+[HKEY_CLASSES_ROOT\*\shell\Send2Drive\command]
+@="\"%APPDATA%\\Share2GoogleDrive\\Share2GoogleDrive.exe\" \"%1\""
+```
+
+## Google OAuth Setup
+
+1. Create project in Google Cloud Console
+2. Enable Google Drive API
+3. Create OAuth 2.0 credentials (Desktop application)
+4. Download `credentials.json`
+5. Configure redirect URI: `http://localhost:{port}/authorize/`
+
+## Error Handling
+
+| Error | User Message | Action |
+|-------|--------------|--------|
+| No internet | "No internet connection. Please check your network." | Retry button |
+| Auth expired | "Session expired. Please sign in again." | Open auth flow |
+| File too large | "File exceeds 5GB limit." | Cancel upload |
+| Upload failed | "Upload failed. Retrying..." | Auto-retry (3x) |
+| Conflict | "File already exists. What would you like to do?" | Show conflict dialog |
