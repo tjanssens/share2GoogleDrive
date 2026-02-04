@@ -5,8 +5,11 @@
   #define PublishType "Framework"
 #endif
 
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
+
 #define MyAppName "Share2GoogleDrive"
-#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Share2GoogleDrive"
 #define MyAppURL "https://github.com/tjanssens/share2GoogleDrive"
 #define MyAppExeName "Share2GoogleDrive.exe"
