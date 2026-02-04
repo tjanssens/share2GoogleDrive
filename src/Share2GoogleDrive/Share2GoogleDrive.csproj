@@ -12,6 +12,11 @@
     <Version>1.0.0</Version>
     <Authors>Share2GoogleDrive</Authors>
     <Description>Upload files to Google Drive from Windows context menu</Description>
+    <Product>Share2GoogleDrive</Product>
+    <Company>Share2GoogleDrive</Company>
+    <Copyright>Copyright (c) 2024 Share2GoogleDrive</Copyright>
+    <RepositoryUrl>https://github.com/tjanssens/share2GoogleDrive</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

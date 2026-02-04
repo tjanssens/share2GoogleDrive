@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Get version from tag
+      id: version
+      run: |
+        $version = "${{ github.ref_name }}".TrimStart('v')
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Building version: $version"
+      shell: pwsh
+
+    - name: Restore dependencies
+      run: dotnet restore src/Share2GoogleDrive/Share2GoogleDrive.csproj
+
+    - name: Publish Framework-dependent
+      run: |
+        dotnet publish src/Share2GoogleDrive/Share2GoogleDrive.csproj `
+          -c Release `
+          -r win-x64 `
+          --self-contained false `
+          -o publish/framework `
+          -p:Version=${{ steps.version.outputs.VERSION }}
+      shell: pwsh
+
+    - name: Publish Self-contained
+      run: |
+        dotnet publish src/Share2GoogleDrive/Share2GoogleDrive.csproj `
+          -c Release `
+          -r win-x64 `
+          --self-contained true `
+          -o publish/standalone `
+          -p:Version=${{ steps.version.outputs.VERSION }}
+      shell: pwsh
+
+    - name: Install Inno Setup
+      run: |
+        choco install innosetup --yes --no-progress
+      shell: pwsh
+
+    - name: Create dist directory
+      run: New-Item -ItemType Directory -Force -Path dist
+      shell: pwsh
+
+    - name: Build Framework-dependent installer
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+          /DPublishType=Framework `
+          /DMyAppVersion=${{ steps.version.outputs.VERSION }} `
+          installer\share2googledrive.iss
+      shell: pwsh
+
+    - name: Build Self-contained installer
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+          /DPublishType=Standalone `
+          /DMyAppVersion=${{ steps.version.outputs.VERSION }} `
+          installer\share2googledrive.iss
+      shell: pwsh
+
+    - name: List dist contents
+      run: Get-ChildItem -Path dist -Recurse
+      shell: pwsh
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Share2GoogleDrive v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## Share2GoogleDrive v${{ steps.version.outputs.VERSION }}
+
+          ### Downloads
+
+          | Installer | Size | Requirements |
+          |-----------|------|--------------|
+          | `Share2GoogleDrive-Setup-${{ steps.version.outputs.VERSION }}.exe` | ~15 MB | [.NET 8.0 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) |
+          | `Share2GoogleDrive-Setup-${{ steps.version.outputs.VERSION }}-Standalone.exe` | ~100 MB | None (includes .NET runtime) |
+
+          ### Installation
+
+          1. Download the installer that matches your needs
+          2. Run the installer (no admin rights required)
+          3. Follow the Mario-themed setup wizard
+          4. Launch Share2GoogleDrive and sign in with your Google account
+
+          ### What's New
+
+          See [CHANGELOG.md](CHANGELOG.md) for details.
+        files: |
+          dist/Share2GoogleDrive-Setup-${{ steps.version.outputs.VERSION }}.exe
+          dist/Share2GoogleDrive-Setup-${{ steps.version.outputs.VERSION }}-Standalone.exe
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

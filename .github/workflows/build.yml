@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore src/Share2GoogleDrive/Share2GoogleDrive.csproj
+
+    - name: Build
+      run: dotnet build src/Share2GoogleDrive/Share2GoogleDrive.csproj -c Release --no-restore
+
+    - name: Test publish (Framework-dependent)
+      run: dotnet publish src/Share2GoogleDrive/Share2GoogleDrive.csproj -c Release -r win-x64 --self-contained false -o publish/framework --no-build
+
+    - name: Verify output
+      run: |
+        if (Test-Path "publish/framework/Share2GoogleDrive.exe") {
+          Write-Host "Build successful - Share2GoogleDrive.exe exists"
+        } else {
+          Write-Error "Build failed - Share2GoogleDrive.exe not found"
+          exit 1
+        }
+      shell: pwsh

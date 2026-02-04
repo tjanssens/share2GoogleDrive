@@ -47,3 +47,7 @@ token/
 
 # User settings
 appsettings.local.json
+
+# Publish output
+publish/
+dist/
